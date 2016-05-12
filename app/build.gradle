@@ -1,0 +1,40 @@
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        release {
+            keyAlias 'Wein El Zbeileh Key'
+            keyPassword 'rizkcarl88'
+            storeFile file('C:/Users/User/Documents/Carl/Keystore/test.jks')
+            storePassword 'rizkcarl88'
+        }
+    }
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+    defaultConfig {
+        applicationId "cfc.weinelzbeileh"
+        minSdkVersion 14
+        targetSdkVersion 23
+        versionCode 20
+        versionName "0.2.0"
+    }
+    buildTypes {
+        release {
+
+            signingConfig signingConfigs.release
+
+            minifyEnabled false
+            shrinkResources true
+            multiDexEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.google.android.gms:play-services:8.4.0'
+    compile 'com.firebase:firebase-client-android:2.5.2'
+}
