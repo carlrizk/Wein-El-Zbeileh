@@ -33,7 +33,6 @@ public class InformationActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(InformationActivity.this, InformationDisplayActivity.class);
                 intent.putExtra("Link", arrayAdapter.getItem(position).getLink());
-                intent.putExtra("Open In App", arrayAdapter.getItem(position).shouldOpenInApp());
                 startActivity(intent);
             }
         });

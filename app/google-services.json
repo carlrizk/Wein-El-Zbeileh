@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "456969940708",
+    "firebase_url": "https://wein-el-zbeileh-16b26.firebaseio.com",
+    "project_id": "wein-el-zbeileh-16b26",
+    "storage_bucket": "wein-el-zbeileh-16b26.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:456969940708:android:60f2e35bd57363ca",
+        "android_client_info": {
+          "package_name": "cfc.weinelzbeileh"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "456969940708-lcv88fi7mki8rmnho0b30k2687ung1uv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cfc.weinelzbeileh",
+            "certificate_hash": "04C1A63091C84A441B0FA4AABA95EED01495B10E"
+          }
+        },
+        {
+          "client_id": "456969940708-3qfpsm3g5q4udp2eros5mpo9h9io3hn7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3g160Qt9r2kum36jPpOjW-qunku2ZOsc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "456969940708-3qfpsm3g5q4udp2eros5mpo9h9io3hn7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

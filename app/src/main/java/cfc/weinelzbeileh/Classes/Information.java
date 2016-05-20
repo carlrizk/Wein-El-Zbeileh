@@ -1,6 +1,6 @@
 package cfc.weinelzbeileh.Classes;
 
-import com.firebase.client.DataSnapshot;
+import com.google.firebase.database.DataSnapshot;
 
 import java.util.Locale;
 
@@ -37,16 +37,6 @@ public class Information {
             return (long) data.child("Priority").getValue();
         }
         return 0;
-    }
-
-    public boolean shouldOpenInApp() {
-        if (data.child("In Browser").getValue() != null) {
-            if ((boolean) data.child("In Browser").getValue()) {
-                return false;
-            }
-        }
-        return true;
-
     }
 
     @Override

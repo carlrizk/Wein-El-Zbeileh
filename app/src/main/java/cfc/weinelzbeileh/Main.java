@@ -2,19 +2,25 @@ package cfc.weinelzbeileh;
 
 import android.app.Application;
 
-import com.firebase.client.Firebase;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import cfc.weinelzbeileh.Classes.TrashType;
 import cfc.weinelzbeileh.Static.InformationManager;
 
 public class Main extends Application {
 
+    public static DatabaseReference rootConnection;
+    public static FirebaseDatabase database;
+
+
     public static boolean alreadyRequestedGPS = false;
     public static boolean isGPSWindowShowing = false;
-    public static boolean isAppInForeground = false;
     private static CameraPosition lastCameraPosition;
 
     public static CameraPosition getLastCameraPosition() {
@@ -29,8 +35,20 @@ public class Main extends Application {
     public void onCreate() {
         super.onCreate();
 
-        Firebase.setAndroidContext(getApplicationContext());
-        Firebase.getDefaultConfig().setPersistenceEnabled(true);
+        FirebaseOptions.Builder builder = new FirebaseOptions.Builder();
+        builder.setStorageBucket("wein-el-zbeileh-16b26.appspot.com");
+        builder.setGcmSenderId("456969940708");
+        builder.setApplicationId("wein-el-zbeileh-16b26");
+        builder.setApiKey("AIzaSyD3g160Qt9r2kum36jPpOjW-qunku2ZOsc");
+        builder.setDatabaseUrl("https://wein-el-zbeileh-16b26.firebaseio.com");
+        FirebaseOptions options = builder.build();
+
+        FirebaseApp app = FirebaseApp.initializeApp(getApplicationContext(), options, "Wein El Zbeileh");
+
+        database = FirebaseDatabase.getInstance(app);
+        rootConnection = database.getReference();
+
+        database.goOffline();
 
         MapsInitializer.initialize(getApplicationContext());
 

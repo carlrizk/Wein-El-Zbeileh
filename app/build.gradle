@@ -15,8 +15,8 @@ android {
         applicationId "cfc.weinelzbeileh"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 20
-        versionName "0.2.0"
+        versionCode 21
+        versionName "0.2.1"
     }
     buildTypes {
         release {
@@ -35,6 +35,8 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.google.android.gms:play-services:8.4.0'
-    compile 'com.firebase:firebase-client-android:2.5.2'
+    compile 'com.google.android.gms:play-services:9.0.0'
+    compile 'com.google.firebase:firebase-messaging:9.0.0'
 }
+
+apply plugin: 'com.google.gms.google-services'

@@ -59,6 +59,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         TrashManager.createMarkers();
 
+        Main.database.goOnline();
+
         map.moveCamera(CameraUpdateFactory.newCameraPosition(Main.getLastCameraPosition()));
 
         if (!hasLocationPermission()) {
@@ -88,11 +90,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
-        Main.isAppInForeground = true;
 
         if (map != null) {
-            map.clear();
-            TrashManager.createMarkers();
+            Main.database.goOnline();
         }
 
         if (Main.isGPSWindowShowing) {
@@ -103,7 +103,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onPause() {
         super.onPause();
-        Main.isAppInForeground = false;
+
+        Main.database.goOffline();
 
         if (map != null) {
             Main.setLastCameraPosition(map.getCameraPosition());

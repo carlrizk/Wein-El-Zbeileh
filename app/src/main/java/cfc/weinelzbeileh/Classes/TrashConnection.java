@@ -1,22 +1,21 @@
 package cfc.weinelzbeileh.Classes;
 
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 
 import cfc.weinelzbeileh.Interfaces.OnTrash;
+import cfc.weinelzbeileh.Main;
 
 public class TrashConnection {
 
-    private static String serverAdress = "https://wein-zbeileh-remake.firebaseio.com/Trash/";
+    private final static String folderAdress = "Trash";
 
-    private String trashAdress;
-    private Firebase connection;
+    private DatabaseReference connection;
 
     public TrashConnection(String trashID, final OnTrash listener) {
-        this.trashAdress = serverAdress + trashID;
-        this.connection = new Firebase(trashAdress);
+        this.connection = Main.rootConnection.child(folderAdress).child(trashID);
 
         connection.addChildEventListener(new ChildEventListener() {
             @Override
@@ -28,6 +27,7 @@ public class TrashConnection {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
             }
 
             @Override
@@ -41,7 +41,7 @@ public class TrashConnection {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });

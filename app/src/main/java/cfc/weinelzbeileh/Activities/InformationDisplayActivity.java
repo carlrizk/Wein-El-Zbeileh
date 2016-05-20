@@ -35,28 +35,20 @@ public class InformationDisplayActivity extends AppCompatActivity {
             }
         });
 
-        if (getIntent().getBooleanExtra("Open In App", false)) {
-            webView.setWebViewClient(new WebViewClient() {
-                @Override
-                public void onPageFinished(WebView view, String url) {
-                    super.onPageFinished(view, url);
-                    progressBar.setVisibility(View.INVISIBLE);
-                }
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                progressBar.setVisibility(View.INVISIBLE);
+            }
 
-                @Override
-                public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                    super.onPageStarted(view, url, favicon);
-                    progressBar.setVisibility(View.VISIBLE);
-                }
-            });
-        }
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
+                progressBar.setVisibility(View.VISIBLE);
+            }
+        });
 
         webView.loadUrl(getIntent().getStringExtra("Link"));
-
-
-        if (!getIntent().getBooleanExtra("Open In App", false)) {
-            finish();
-        }
-
     }
 }

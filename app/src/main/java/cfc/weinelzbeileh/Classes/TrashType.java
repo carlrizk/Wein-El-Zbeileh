@@ -12,7 +12,6 @@ import java.util.Map;
 
 import cfc.weinelzbeileh.Activities.MapsActivity;
 import cfc.weinelzbeileh.Interfaces.OnTrash;
-import cfc.weinelzbeileh.Main;
 import cfc.weinelzbeileh.R;
 import cfc.weinelzbeileh.Static.TrashManager;
 
@@ -70,9 +69,7 @@ public class TrashType {
     private void createTrash(String id, double lat, double lng) {
         Trash trash = new Trash(this, lat, lng);
         trashMap.put(id, trash);
-        if (Main.isAppInForeground && MapsActivity.map != null) {
-            trash.createMarker(MapsActivity.map, trashTitle, icon, showing);
-        }
+        trash.createMarker(trashTitle, icon, showing);
     }
 
     private void deleteTrash(String id) {
@@ -85,7 +82,7 @@ public class TrashType {
 
     public void createMarkers() {
         for (Trash t : trashMap.values()) {
-            t.createMarker(MapsActivity.map, trashTitle, icon, showing);
+            t.createMarker(trashTitle, icon, showing);
         }
     }
 
