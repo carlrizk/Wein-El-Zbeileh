@@ -4,8 +4,4 @@
     <string name="information_title">مركز المعلومات</string>
     <string name="no">كلا</string>
     <string name="yes">نعم</string>
-    <string name="trash_glass">زبالة الزجاج</string>
-    <string name="trash_plastic">زبالة المواد البلستكية</string>
-    <string name="trash_paper">زبالة الكرتون و الورق</string>
-    <string name="trash_metal">زبالة الحديد</string>
 </resources>

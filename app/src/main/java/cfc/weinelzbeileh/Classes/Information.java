@@ -6,7 +6,7 @@ import java.util.Locale;
 
 public class Information {
 
-    public DataSnapshot data;
+    private DataSnapshot data;
 
     public Information(DataSnapshot data) {
         this.data = data;

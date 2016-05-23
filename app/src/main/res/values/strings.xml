@@ -7,11 +7,6 @@
 
     <string name="gps_disabled">Your GPS is disabled.\nDo you want to enable it?</string>
 
-    <string name="trash_metal">Metal Trash</string>
-    <string name="trash_glass">Glass Trash</string>
-    <string name="trash_plastic">Plastic Trash</string>
-    <string name="trash_paper">Paper Trash</string>
-
     <string name="information_title">Information Centre</string>
 
 </resources>

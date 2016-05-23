@@ -19,31 +19,32 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 
+import cfc.weinelzbeileh.Classes.Trash;
+import cfc.weinelzbeileh.Classes.TrashType;
 import cfc.weinelzbeileh.Main;
 import cfc.weinelzbeileh.R;
-import cfc.weinelzbeileh.Static.TrashManager;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     public static GoogleMap map;
 
     private int PERMISSIONS_REQUEST_LOCATION = 0;
-    private ImageView informationButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        informationButton = (ImageView) findViewById(R.id.information);
+        ImageView informationButton = (ImageView) findViewById(R.id.information);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(this);
 
-        TrashManager.createButtons(this);
+        for (TrashType t : TrashType.trashTypeMap.values()) {
+            t.createButton(this);
+        }
 
         informationButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,8 +58,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
-        TrashManager.createMarkers();
-
         Main.database.goOnline();
 
         map.moveCamera(CameraUpdateFactory.newCameraPosition(Main.getLastCameraPosition()));
@@ -69,13 +68,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             enableMyLocation();
         }
 
-        map.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-            @Override
-            public void onCameraChange(CameraPosition cameraPosition) {
-                TrashManager.updateMarkersOnCameraChange(map.getProjection().getVisibleRegion().latLngBounds);
-            }
-        });
-
         map.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
             @Override
             public boolean onMyLocationButtonClick() {
@@ -85,6 +77,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 return false;
             }
         });
+
+        Trash.createMarkers();
     }
 
     @Override

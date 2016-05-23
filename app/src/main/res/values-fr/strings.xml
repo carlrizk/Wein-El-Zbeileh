@@ -3,10 +3,6 @@
 
     <string name="gps_disabled">Votre GPS n\'est pas activé.\nVoulez vous l\'activer?</string>
     <string name="information_title">Centre D\' information</string>
-    <string name="trash_paper">Poubelle de Papier</string>
-    <string name="trash_plastic">Poubelle de Plastique</string>
-    <string name="trash_glass">Poubelle de Verre</string>
-    <string name="trash_metal">Poubelle de Metal</string>
     <string name="yes">Oui</string>
     <string name="no">Non</string>
 

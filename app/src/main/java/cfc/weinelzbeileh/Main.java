@@ -1,6 +1,8 @@
 package cfc.weinelzbeileh;
 
 import android.app.Application;
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -12,12 +14,13 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import cfc.weinelzbeileh.Classes.TrashType;
 import cfc.weinelzbeileh.Static.InformationManager;
+import cfc.weinelzbeileh.Static.TrashConnection;
 
 public class Main extends Application {
 
     public static DatabaseReference rootConnection;
     public static FirebaseDatabase database;
-
+    public static Context context;
 
     public static boolean alreadyRequestedGPS = false;
     public static boolean isGPSWindowShowing = false;
@@ -34,6 +37,8 @@ public class Main extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        context = getApplicationContext();
 
         FirebaseOptions.Builder builder = new FirebaseOptions.Builder();
         builder.setStorageBucket("wein-el-zbeileh-16b26.appspot.com");
@@ -54,11 +59,17 @@ public class Main extends Application {
 
         lastCameraPosition = new CameraPosition(new LatLng(33.8793113, 35.7611118), 8.5f, 0, 0);
 
-        new TrashType("Metal", getApplicationContext().getString(R.string.trash_metal), R.drawable.metal);
-        new TrashType("Paper", getApplicationContext().getString(R.string.trash_paper), R.drawable.paper);
-        new TrashType("Glass", getApplicationContext().getString(R.string.trash_glass), R.drawable.glass);
-        new TrashType("Plastic", getApplicationContext().getString(R.string.trash_plastic), R.drawable.plastic);
+
+        TrashType.assignColors(ContextCompat.getColor(context, R.color.white), ContextCompat.getColor(context, R.color.colorPrimary));
+
+
+        new TrashType("Metal", R.drawable.metal);
+        new TrashType("Paper", R.drawable.paper);
+        new TrashType("Glass", R.drawable.glass);
+        new TrashType("Plastic", R.drawable.plastic);
 
         InformationManager.init();
+
+        TrashConnection.init();
     }
 }
