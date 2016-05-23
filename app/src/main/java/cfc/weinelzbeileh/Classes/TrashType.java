@@ -45,7 +45,7 @@ public class TrashType {
     public void toggleShowing() {
         showing = !showing;
         for (Trash t : trashList) {
-            t.updateVisibility(this, showing);
+            t.updateMarker();
         }
         updateButton();
     }
@@ -90,5 +90,9 @@ public class TrashType {
 
     public int getIcon() {
         return icon;
+    }
+
+    public boolean isShowing() {
+        return showing;
     }
 }
