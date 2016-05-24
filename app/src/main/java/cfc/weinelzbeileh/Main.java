@@ -14,6 +14,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import cfc.weinelzbeileh.Classes.TrashType;
 import cfc.weinelzbeileh.Static.InformationManager;
+import cfc.weinelzbeileh.Static.MarkerBitmapUtil;
 import cfc.weinelzbeileh.Static.TrashConnection;
 
 public class Main extends Application {
@@ -39,6 +40,8 @@ public class Main extends Application {
         super.onCreate();
 
         context = getApplicationContext();
+
+        MarkerBitmapUtil.MULTIPLIER = context.getResources().getDisplayMetrics().density;
 
         FirebaseOptions.Builder builder = new FirebaseOptions.Builder();
         builder.setStorageBucket("wein-el-zbeileh-16b26.appspot.com");

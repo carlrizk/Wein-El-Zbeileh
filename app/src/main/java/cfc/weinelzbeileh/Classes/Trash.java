@@ -68,10 +68,11 @@ public class Trash {
                     ts.add(t);
                 }
             }
-
-            marker.setIcon(BitmapDescriptorFactory.fromBitmap(MarkerBitmapUtil.createBitmap(ts)));
-            marker.setAnchor(0.5f, 0.5f);
             marker.setVisible(shouldShow());
+            if (marker.isVisible()) {
+                marker.setIcon(BitmapDescriptorFactory.fromBitmap(MarkerBitmapUtil.createBitmap(ts)));
+                marker.setAnchor(0.5f, 0.5f);
+            }
         }
     }
 
