@@ -46,7 +46,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String CAMERA_LONGITUDE = "CAMERA_LONGITUDE";
     private static final String CAMERA_ZOOM = "CAMERA_ZOOM";
 
-    public static Context context;
     private DatabaseReference trashDatabaseReference;
 
     private int PERMISSIONS_REQUEST_LOCATION = 0;
@@ -72,7 +71,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void LoadData(Bundle bundle) {
-        context = getApplicationContext();
         createTrashTypes();
         if (bundle != null) {
             isGPSWindowShowing = bundle.getBoolean(GPS_WINDOW);
@@ -130,7 +128,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         Trash t = new Trash(id, latlng, trashTypes);
         if (map != null) {
-            t.createMarker(map);
+            t.createMarker(this, map);
         }
     }
 
@@ -188,7 +186,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     trashType.toggleShowing();
                     updateToggleButton(trashType);
                     for (Trash t : trashType.getIncludedTrashes()) {
-                        t.updateMarker();
+                        t.updateMarker(getApplicationContext());
                     }
                 }
             };
@@ -210,9 +208,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ImageView button = toggleButtons.get(trashType);
         int color;
         if (trashType.isShowing()) {
-            color = ContextCompat.getColor(context, R.color.white);
+            color = ContextCompat.getColor(this, R.color.white);
         } else {
-            color = ContextCompat.getColor(context, R.color.colorPrimary);
+            color = ContextCompat.getColor(this, R.color.colorPrimary);
         }
         button.setBackgroundColor(color);
     }
@@ -242,7 +240,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         for (Trash t : Trash.getAll().values()) {
-            t.createMarker(map);
+            t.createMarker(this, map);
         }
 
     }

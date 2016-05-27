@@ -1,15 +1,32 @@
-package cfc.weinelzbeileh.Classes;
+package cfc.weinelzbeileh.classes;
 
 import com.google.firebase.database.DataSnapshot;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class Information {
+
+    private static Map<String, Information> informationMap = new HashMap<>();
 
     private DataSnapshot data;
 
     public Information(DataSnapshot data) {
         this.data = data;
+        informationMap.put(data.getKey(), this);
+    }
+
+    public static void deleteInformation(String key) {
+        informationMap.remove(key);
+    }
+
+    public static Map<String, Information> getInformationMap() {
+        return informationMap;
+    }
+
+    public static void clear() {
+        informationMap.clear();
     }
 
     public String getTitle() {
@@ -37,6 +54,13 @@ public class Information {
             return (long) data.child("Priority").getValue();
         }
         return 0;
+    }
+
+    public boolean shouldOpenInApp() {
+        if (data.child("In App").getValue() != null) {
+            return (boolean) data.child("In App").getValue();
+        }
+        return false;
     }
 
     @Override

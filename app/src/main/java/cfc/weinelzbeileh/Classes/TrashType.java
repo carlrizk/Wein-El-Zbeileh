@@ -1,98 +1,74 @@
-package cfc.weinelzbeileh.Classes;
-
-import android.app.Activity;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+package cfc.weinelzbeileh.classes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cfc.weinelzbeileh.R;
-
 public class TrashType {
 
-    public static Map<String, TrashType> trashTypeMap = new HashMap<>();
-    private static int enabledColor, disabledColor;
-    private List<Trash> trashList = new ArrayList<>();
-    private ImageView button;
+    private static Map<String, TrashType> trashTypeMap = new HashMap<>();
 
+    private List<Trash> includedTrashes;
+
+    private String id;
     private int icon;
     private boolean showing = true;
 
-    public TrashType(String trashType, int icon) {
-
+    public TrashType(String id, int icon) {
+        this.includedTrashes = new ArrayList<>();
+        this.id = id;
         this.icon = icon;
-
-        trashTypeMap.put(trashType, this);
+        trashTypeMap.put(id, this);
     }
 
-    public static void assignColors(int enabled, int disabled) {
-        enabledColor = enabled;
-        disabledColor = disabled;
+    public static void clear() {
+        trashTypeMap.clear();
     }
 
-    public void addTrash(Trash t) {
-        trashList.add(t);
+    public static boolean exists(String key) {
+        return trashTypeMap.containsKey(key);
     }
 
-    public void removeTrash(Trash t) {
-        trashList.remove(t);
+    public static TrashType get(String key) {
+        return trashTypeMap.get(key);
     }
 
-    public void toggleShowing() {
-        showing = !showing;
-        for (Trash t : trashList) {
-            t.updateMarker();
-        }
-        updateButton();
-    }
-
-    public void createButton(Activity a) {
-        LinearLayout layout = (LinearLayout) a.findViewById(R.id.toggleLinearLayout);
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f);
-        params.setMargins(2, 0, 2, 0);
-
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleShowing();
-            }
-        };
-
-        if (button != null) {
-            layout.removeView(button);
-        }
-
-        button = new ImageView(a);
-        button.setLayoutParams(params);
-        button.setImageResource(icon);
-        button.setPadding(0, 4, 0, 4);
-        button.setOnClickListener(listener);
-
-        layout.addView(button);
-
-        updateButton();
-    }
-
-    public void updateButton() {
-        if (button != null) {
-            if (showing) {
-                button.setBackgroundColor(enabledColor);
-            } else {
-                button.setBackgroundColor(disabledColor);
-            }
-        }
+    public static Map<String, TrashType> getAll() {
+        return trashTypeMap;
     }
 
     public int getIcon() {
         return icon;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public List<Trash> getIncludedTrashes() {
+        return includedTrashes;
+    }
+
     public boolean isShowing() {
         return showing;
+    }
+
+    public void setShowing(boolean showing) {
+        this.showing = showing;
+    }
+
+    public void toggleShowing() {
+        showing = !showing;
+    }
+
+    public void insert(Trash trash) {
+        includedTrashes.add(trash);
+    }
+
+    public void remove(Trash trash) {
+        if (includedTrashes.contains(trash)) {
+            includedTrashes.remove(trash);
+        }
     }
 }

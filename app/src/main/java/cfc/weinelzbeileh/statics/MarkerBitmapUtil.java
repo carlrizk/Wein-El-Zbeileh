@@ -1,5 +1,6 @@
 package cfc.weinelzbeileh.statics;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -11,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cfc.weinelzbeileh.activities.MapsActivity;
 import cfc.weinelzbeileh.classes.TrashType;
 
 public class MarkerBitmapUtil {
@@ -22,7 +22,7 @@ public class MarkerBitmapUtil {
     public static float MULTIPLIER;
     private static Map<List<TrashType>, Bitmap> bitmaps = new HashMap<>();
 
-    public static Bitmap createBitmap(List<TrashType> trashTypes) {
+    public static Bitmap createBitmap(Context context, List<TrashType> trashTypes) {
         if (!bitmaps.containsKey(trashTypes)) {
             Bitmap.Config config = Bitmap.Config.ARGB_8888;
             Bitmap bmp = Bitmap.createBitmap((int) (trashTypes.size() * WIDTH * MULTIPLIER), (int) ((HEIGHT + 4) * MULTIPLIER), config);
@@ -40,7 +40,7 @@ public class MarkerBitmapUtil {
             float x = 0;
             float y = 2 * MULTIPLIER;
             for (TrashType t : trashTypes) {
-                canvas.drawBitmap(BitmapFactory.decodeResource(MapsActivity.context.getResources(), t.getIcon()), x, y, color);
+                canvas.drawBitmap(BitmapFactory.decodeResource(context.getResources(), t.getIcon()), x, y, color);
                 x += WIDTH * MULTIPLIER;
             }
 
