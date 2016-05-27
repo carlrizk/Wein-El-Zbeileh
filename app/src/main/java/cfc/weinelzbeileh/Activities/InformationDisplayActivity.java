@@ -1,4 +1,4 @@
-package cfc.weinelzbeileh.Activities;
+package cfc.weinelzbeileh.activities;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -40,6 +40,10 @@ public class InformationDisplayActivity extends AppCompatActivity {
                 public void onPageFinished(WebView view, String url) {
                     super.onPageFinished(view, url);
                     progressBar.setVisibility(View.INVISIBLE);
+
+                    if (getSupportActionBar() != null) {
+                        getSupportActionBar().setTitle(view.getTitle());
+                    }
                 }
 
                 @Override
@@ -49,7 +53,13 @@ public class InformationDisplayActivity extends AppCompatActivity {
                 }
             });
 
-            webView.loadUrl(getIntent().getStringExtra("Link"));
+            String link = getIntent().getStringExtra("Link");
+
+            webView.loadUrl(link);
+
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(link);
+            }
         }
     }
 }

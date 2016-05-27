@@ -8,21 +8,11 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="cfc.weinelzbeileh.Activities.InformationActivity">
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/information_title"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="30sp" />
+    tools:context="cfc.weinelzbeileh.activities.InformationActivity">
 
     <ListView
-        android:id="@+id/informationListView"
+        android:id="@+id/listview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="16dp"
-        android:choiceMode="singleChoice" />
+        android:layout_height="match_parent" />
+
 </LinearLayout>
