@@ -5,5 +5,6 @@
     <string name="information_title">Centre D\' information</string>
     <string name="yes">Oui</string>
     <string name="no">Non</string>
+    <string name="loading">Chargement…</string>
 
 </resources>

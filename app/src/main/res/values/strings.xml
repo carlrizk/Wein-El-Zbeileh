@@ -8,5 +8,6 @@
     <string name="gps_disabled">Your GPS is disabled.\nDo you want to enable it?</string>
 
     <string name="information_title">Information Centre</string>
+    <string name="loading">Loading…</string>
 
 </resources>

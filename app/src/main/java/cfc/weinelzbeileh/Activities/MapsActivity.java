@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import cfc.weinelzbeileh.R;
+import cfc.weinelzbeileh.classes.Information;
 import cfc.weinelzbeileh.classes.Trash;
 import cfc.weinelzbeileh.classes.TrashType;
 import cfc.weinelzbeileh.statics.MarkerBitmapUtil;
@@ -46,7 +48,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String CAMERA_LONGITUDE = "CAMERA_LONGITUDE";
     private static final String CAMERA_ZOOM = "CAMERA_ZOOM";
 
-    private DatabaseReference trashDatabaseReference;
+    private DatabaseReference trashDatabase;
+    private ChildEventListener trashChildEventListener;
+    private DatabaseReference infoDatabase;
+    private ChildEventListener infoChildEventListener;
 
     private int PERMISSIONS_REQUEST_LOCATION = 0;
     private Map<TrashType, ImageView> toggleButtons = new HashMap<>();
@@ -66,6 +71,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void reloadTrashTypes(Bundle bundle) {
         for (TrashType t : TrashType.getAll().values()) {
+            Log.i(t.getId(), String.valueOf(bundle.getBoolean(t.getId())));
             t.setShowing(bundle.getBoolean(t.getId()));
         }
     }
@@ -91,49 +97,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        LoadData(savedInstanceState);
-
         setContentView(R.layout.activity_maps);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-
         mapFragment.getMapAsync(this);
+        createInformationButton();
+
+        LoadData(savedInstanceState);
 
         createToggleButtons();
-        createInformationButton();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        trashDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Trash");
-        DatabaseReference.goOffline();
-        createDatabaseConnection();
-    }
-
-    private void addTrash(DataSnapshot dataSnapshot) {
-        String id = dataSnapshot.getKey();
-        DataSnapshot position = dataSnapshot.child("Position");
-        LatLng latlng = new LatLng((double) position.child("Latitude").getValue(), (double) position.child("Longitude").getValue());
-        DataSnapshot type = dataSnapshot.child("Type");
-        List<TrashType> trashTypes = new ArrayList<>();
-        for (DataSnapshot data : type.getChildren()) {
-            if (TrashType.exists(data.getKey())) {
-                if ((boolean) data.getValue()) {
-                    trashTypes.add(TrashType.get(data.getKey()));
-                }
-            }
-        }
-        Trash t = new Trash(id, latlng, trashTypes);
-        if (map != null) {
-            t.createMarker(this, map);
-        }
-    }
-
-    private void createDatabaseConnection() {
-        trashDatabaseReference.addChildEventListener(new ChildEventListener() {
+        trashDatabase = FirebaseDatabase.getInstance().getReference().child("Trash");
+        infoDatabase = FirebaseDatabase.getInstance().getReference().child("Information");
+        trashChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 addTrash(dataSnapshot);
@@ -159,8 +140,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
+        infoChildEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                new Information(dataSnapshot);
+            }
 
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Information.deleteInformation(dataSnapshot.getKey());
+                new Information(dataSnapshot);
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Information.deleteInformation(dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+    }
+
+    private void addTrash(DataSnapshot dataSnapshot) {
+        String id = dataSnapshot.getKey();
+        DataSnapshot position = dataSnapshot.child("Position");
+        LatLng latlng = new LatLng((double) position.child("Latitude").getValue(), (double) position.child("Longitude").getValue());
+        DataSnapshot type = dataSnapshot.child("Type");
+        List<TrashType> trashTypes = new ArrayList<>();
+        for (DataSnapshot data : type.getChildren()) {
+            if (TrashType.exists(data.getKey())) {
+                if ((boolean) data.getValue()) {
+                    trashTypes.add(TrashType.get(data.getKey()));
+                }
+            }
+        }
+        Trash t = new Trash(id, latlng, trashTypes);
+        if (map != null) {
+            t.createMarker(this, map);
+        }
     }
 
     private void createInformationButton() {
@@ -219,7 +245,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
-        DatabaseReference.goOffline();
+        trashDatabase.addChildEventListener(trashChildEventListener);
 
         map.moveCamera(CameraUpdateFactory.newCameraPosition(lastCameraPosition));
 
@@ -249,24 +275,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onResume() {
         super.onResume();
 
-        if (map != null) {
-            DatabaseReference.goOnline();
-        }
-
         if (isGPSWindowShowing) {
             buildAlertMessageNoGps(getResources().getString(R.string.gps_disabled), getResources().getString(R.string.yes), getResources().getString(R.string.no));
         }
+
+        if (map != null) {
+            trashDatabase.addChildEventListener(trashChildEventListener);
+        }
+        Information.clear();
+        infoDatabase.addChildEventListener(infoChildEventListener);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        DatabaseReference.goOffline();
-
         if (map != null) {
             lastCameraPosition = map.getCameraPosition();
         }
+
+        trashDatabase.removeEventListener(trashChildEventListener);
     }
 
 
@@ -342,8 +370,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
+        trashDatabase.removeEventListener(trashChildEventListener);
+        infoDatabase.removeEventListener(infoChildEventListener);
+        infoChildEventListener = null;
+        infoDatabase = null;
+        trashChildEventListener = null;
+        trashDatabase = null;
         TrashType.clear();
         Trash.clear();
     }
