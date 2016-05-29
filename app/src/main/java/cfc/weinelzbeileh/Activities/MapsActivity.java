@@ -12,7 +12,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,21 +22,18 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cfc.weinelzbeileh.FirebaseUtilInterface;
 import cfc.weinelzbeileh.R;
-import cfc.weinelzbeileh.classes.Information;
 import cfc.weinelzbeileh.classes.Trash;
 import cfc.weinelzbeileh.classes.TrashType;
+import cfc.weinelzbeileh.statics.FirebaseUtil;
 import cfc.weinelzbeileh.statics.MarkerBitmapUtil;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -48,11 +44,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String CAMERA_LONGITUDE = "CAMERA_LONGITUDE";
     private static final String CAMERA_ZOOM = "CAMERA_ZOOM";
 
-    private DatabaseReference trashDatabase;
-    private ChildEventListener trashChildEventListener;
-    private DatabaseReference infoDatabase;
-    private ChildEventListener infoChildEventListener;
-
     private int PERMISSIONS_REQUEST_LOCATION = 0;
     private Map<TrashType, ImageView> toggleButtons = new HashMap<>();
     private GoogleMap map;
@@ -62,22 +53,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean isGPSWindowShowing;
     private boolean alreadyRequestedGPS;
 
-    private void createTrashTypes() {
-        new TrashType("Glass", R.drawable.glass);
-        new TrashType("Metal", R.drawable.metal);
-        new TrashType("Plastic", R.drawable.plastic);
-        new TrashType("Paper", R.drawable.paper);
-    }
-
-    private void reloadTrashTypes(Bundle bundle) {
-        for (TrashType t : TrashType.getAll().values()) {
-            Log.i(t.getId(), String.valueOf(bundle.getBoolean(t.getId())));
-            t.setShowing(bundle.getBoolean(t.getId()));
-        }
-    }
-
     private void LoadData(Bundle bundle) {
-        createTrashTypes();
         if (bundle != null) {
             isGPSWindowShowing = bundle.getBoolean(GPS_WINDOW);
             alreadyRequestedGPS = bundle.getBoolean(GPS_REQUEST);
@@ -85,7 +61,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double lng = bundle.getDouble(CAMERA_LONGITUDE);
             float zoom = bundle.getFloat(CAMERA_ZOOM);
             lastCameraPosition = new CameraPosition(new LatLng(lat, lng), zoom, 0, 0);
-            reloadTrashTypes(bundle);
         } else {
             lastCameraPosition = new CameraPosition(new LatLng(33.8793113, 35.7611118), 8.5f, 0, 0);
             isGPSWindowShowing = false;
@@ -105,6 +80,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         LoadData(savedInstanceState);
 
+        FirebaseUtil.init(this);
+
         createToggleButtons();
     }
 
@@ -112,62 +89,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onStart() {
         super.onStart();
 
-        trashDatabase = FirebaseDatabase.getInstance().getReference().child("Trash");
-        infoDatabase = FirebaseDatabase.getInstance().getReference().child("Information");
-        trashChildEventListener = new ChildEventListener() {
+        FirebaseUtil.addChild("Trash", new FirebaseUtilInterface() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                addTrash(dataSnapshot);
+            public void OnAdd(DataSnapshot data) {
+                addTrash(data);
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Trash.get(dataSnapshot.getKey()).destroy();
-                addTrash(dataSnapshot);
+            public void OnRemove(DataSnapshot data) {
+                Trash.get(data.getKey()).destroy();
             }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Trash.get(dataSnapshot.getKey()).destroy();
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        infoChildEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                new Information(dataSnapshot);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Information.deleteInformation(dataSnapshot.getKey());
-                new Information(dataSnapshot);
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Information.deleteInformation(dataSnapshot.getKey());
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
+        });
     }
 
     private void addTrash(DataSnapshot dataSnapshot) {
@@ -224,6 +156,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             button.setOnClickListener(listener);
 
             layout.addView(button);
+            if (toggleButtons.containsKey(trashType)) {
+                toggleButtons.remove(trashType);
+            }
             toggleButtons.put(trashType, button);
 
             updateToggleButton(trashType);
@@ -234,9 +169,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ImageView button = toggleButtons.get(trashType);
         int color;
         if (trashType.isShowing()) {
-            color = ContextCompat.getColor(this, R.color.white);
+            color = TrashType.getColorEnabled();
         } else {
-            color = ContextCompat.getColor(this, R.color.colorPrimary);
+            color = TrashType.getColorDisabled();
         }
         button.setBackgroundColor(color);
     }
@@ -245,7 +180,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
-        trashDatabase.addChildEventListener(trashChildEventListener);
+        FirebaseUtil.start();
 
         map.moveCamera(CameraUpdateFactory.newCameraPosition(lastCameraPosition));
 
@@ -280,10 +215,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         if (map != null) {
-            trashDatabase.addChildEventListener(trashChildEventListener);
+            FirebaseUtil.start();
         }
-        Information.clear();
-        infoDatabase.addChildEventListener(infoChildEventListener);
     }
 
     @Override
@@ -294,7 +227,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             lastCameraPosition = map.getCameraPosition();
         }
 
-        trashDatabase.removeEventListener(trashChildEventListener);
+        FirebaseUtil.stop();
     }
 
 
@@ -362,23 +295,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         outState.putDouble(CAMERA_LONGITUDE, lastCameraPosition.target.longitude);
         outState.putFloat(CAMERA_ZOOM, lastCameraPosition.zoom);
 
-        for (TrashType t : TrashType.getAll().values()) {
-            outState.putBoolean(t.getId(), t.isShowing());
-        }
-
         super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        trashDatabase.removeEventListener(trashChildEventListener);
-        infoDatabase.removeEventListener(infoChildEventListener);
-        infoChildEventListener = null;
-        infoDatabase = null;
-        trashChildEventListener = null;
-        trashDatabase = null;
-        TrashType.clear();
+        FirebaseUtil.clear();
         Trash.clear();
     }
 }

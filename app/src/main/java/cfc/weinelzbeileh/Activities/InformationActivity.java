@@ -8,26 +8,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.util.Comparator;
-
 import cfc.weinelzbeileh.R;
 import cfc.weinelzbeileh.classes.Information;
 
 public class InformationActivity extends AppCompatActivity {
 
     private ListView listView;
-    private ArrayAdapter<Information> arrayAdapter;
-
-    private AdapterView.OnItemClickListener onItemClickListener;
+    private ArrayAdapter<Object> arrayAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_information);
-
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setSubtitle(R.string.loading);
-        }
 
         listView = (ListView) findViewById(R.id.listview);
     }
@@ -35,52 +27,20 @@ public class InformationActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
-        onItemClickListener = new AdapterView.OnItemClickListener() {
+        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, Information.getAll());
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Information info = arrayAdapter.getItem(position);
-                String link = info.getLink();
-                //if (info.shouldOpenInApp()) {
+                String title = (String) arrayAdapter.getItem(position);
+                int layout = Information.getLayout(title);
                 Intent intent = new Intent(InformationActivity.this, InformationDisplayActivity.class);
-                intent.putExtra("Link", link);
+                intent.putExtra("Layout", layout);
                 startActivity(intent);
-                //} else {
-                //   startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
-                //}
-            }
-        };
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        refreshList();
-
-        listView.setOnItemClickListener(onItemClickListener);
-    }
-
-    private void refreshList() {
-        arrayAdapter.addAll(Information.getInformationMap().values());
-        arrayAdapter.sort(new Comparator<Information>() {
-            @Override
-            public int compare(Information lhs, Information rhs) {
-                return lhs.getPriority() > rhs.getPriority() ? -1 : (lhs == rhs ? 1 : 0);
             }
         });
-        arrayAdapter.notifyDataSetChanged();
-        listView.setAdapter(arrayAdapter);
-        if (arrayAdapter.getCount() > 0 && getSupportActionBar() != null) {
-            getSupportActionBar().setSubtitle(null);
-        }
-    }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        arrayAdapter.clear();
-        listView.setOnItemClickListener(null);
-        onItemClickListener = null;
+        listView.setAdapter(arrayAdapter);
     }
 }

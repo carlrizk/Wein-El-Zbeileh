@@ -15,8 +15,8 @@ android {
         applicationId "cfc.weinelzbeileh"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 36
-        versionName "0.3.6"
+        versionCode 37
+        versionName "0.3.7"
     }
     buildTypes {
         release {

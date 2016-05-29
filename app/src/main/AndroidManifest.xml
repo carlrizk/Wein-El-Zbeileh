@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".Main"
         android:allowBackup="true"
         android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
