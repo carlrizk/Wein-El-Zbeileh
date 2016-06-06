@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="gps_disabled">Votre GPS n\'est pas activé.\nVoulez vous l\'activer?</string>
+    <string name="gps_disabled">GPS est nécessaire pour trouver votre position</string>
     <string name="information_title">Centre D\' information</string>
-    <string name="yes">Oui</string>
-    <string name="no">Non</string>
     <string name="loading">Chargement…</string>
 
 </resources>

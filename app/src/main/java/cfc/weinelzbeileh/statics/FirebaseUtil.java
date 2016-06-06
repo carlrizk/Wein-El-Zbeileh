@@ -13,7 +13,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.HashMap;
 import java.util.Map;
 
-import cfc.weinelzbeileh.FirebaseUtilInterface;
+import cfc.weinelzbeileh.interfaces.FirebaseUtilInterface;
 
 public class FirebaseUtil {
 
@@ -70,13 +70,13 @@ public class FirebaseUtil {
         }
     }
 
-    public static void stop() {
+    public static void pause() {
         for (DatabaseReference d : databaseMap.keySet()) {
             d.removeEventListener(databaseMap.get(d));
         }
     }
 
-    public static void clear() {
+    public static void stop() {
         databaseMap.clear();
     }
 

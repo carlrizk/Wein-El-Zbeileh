@@ -8,6 +8,7 @@ import java.util.Map;
 public class TrashType {
 
     private static Map<String, TrashType> trashTypeMap = new HashMap<>();
+    private static int enabled, disabled;
 
     private List<Trash> includedTrashes;
 
@@ -22,10 +23,6 @@ public class TrashType {
         trashTypeMap.put(id, this);
     }
 
-    public static void clear() {
-        trashTypeMap.clear();
-    }
-
     public static boolean exists(String key) {
         return trashTypeMap.containsKey(key);
     }
@@ -36,6 +33,19 @@ public class TrashType {
 
     public static Map<String, TrashType> getAll() {
         return trashTypeMap;
+    }
+
+    public static void assignColors(int _enabled, int _disabled) {
+        enabled = _enabled;
+        disabled = _disabled;
+    }
+
+    public static int getColorEnabled() {
+        return enabled;
+    }
+
+    public static int getColorDisabled() {
+        return disabled;
     }
 
     public int getIcon() {
@@ -52,10 +62,6 @@ public class TrashType {
 
     public boolean isShowing() {
         return showing;
-    }
-
-    public void setShowing(boolean showing) {
-        this.showing = showing;
     }
 
     public void toggleShowing() {

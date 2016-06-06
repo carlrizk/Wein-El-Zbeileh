@@ -1,4 +1,4 @@
-package cfc.weinelzbeileh;
+package cfc.weinelzbeileh.interfaces;
 
 import com.google.firebase.database.DataSnapshot;
 

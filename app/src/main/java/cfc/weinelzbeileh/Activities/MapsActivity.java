@@ -2,7 +2,6 @@ package cfc.weinelzbeileh.activities;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
@@ -11,10 +10,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,17 +28,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cfc.weinelzbeileh.FirebaseUtilInterface;
 import cfc.weinelzbeileh.R;
 import cfc.weinelzbeileh.classes.Trash;
 import cfc.weinelzbeileh.classes.TrashType;
+import cfc.weinelzbeileh.interfaces.FirebaseUtilInterface;
 import cfc.weinelzbeileh.statics.FirebaseUtil;
 import cfc.weinelzbeileh.statics.MarkerBitmapUtil;
 
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private static final String GPS_WINDOW = "GPS_WINDOW";
-    private static final String GPS_REQUEST = "GPS_REQUEST";
     private static final String CAMERA_LATITUDE = "CAMERA_LATITUDE";
     private static final String CAMERA_LONGITUDE = "CAMERA_LONGITUDE";
     private static final String CAMERA_ZOOM = "CAMERA_ZOOM";
@@ -50,21 +48,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //Data To Load \\
     private CameraPosition lastCameraPosition;
-    private boolean isGPSWindowShowing;
-    private boolean alreadyRequestedGPS;
 
     private void LoadData(Bundle bundle) {
         if (bundle != null) {
-            isGPSWindowShowing = bundle.getBoolean(GPS_WINDOW);
-            alreadyRequestedGPS = bundle.getBoolean(GPS_REQUEST);
             double lat = bundle.getDouble(CAMERA_LATITUDE);
             double lng = bundle.getDouble(CAMERA_LONGITUDE);
             float zoom = bundle.getFloat(CAMERA_ZOOM);
             lastCameraPosition = new CameraPosition(new LatLng(lat, lng), zoom, 0, 0);
         } else {
             lastCameraPosition = new CameraPosition(new LatLng(33.8793113, 35.7611118), 8.5f, 0, 0);
-            isGPSWindowShowing = false;
-            alreadyRequestedGPS = false;
         }
         MarkerBitmapUtil.MULTIPLIER = getResources().getDisplayMetrics().density;
     }
@@ -76,6 +68,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
         createInformationButton();
 
         LoadData(savedInstanceState);
@@ -83,6 +76,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         FirebaseUtil.init(this);
 
         createToggleButtons();
+
     }
 
     @Override
@@ -187,14 +181,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (!hasLocationPermission()) {
             requestLocationPermission();
         } else {
-            enableMyLocation();
+            map.setMyLocationEnabled(true);
         }
 
         map.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
             @Override
             public boolean onMyLocationButtonClick() {
                 if (!isGPSEnabled()) {
-                    buildAlertMessageNoGps(getResources().getString(R.string.gps_disabled), getResources().getString(R.string.yes), getResources().getString(R.string.no));
+                    Toast.makeText(getApplicationContext(), R.string.gps_disabled, Toast.LENGTH_LONG).show();
                 }
                 return false;
             }
@@ -210,26 +204,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onResume() {
         super.onResume();
 
-        if (isGPSWindowShowing) {
-            buildAlertMessageNoGps(getResources().getString(R.string.gps_disabled), getResources().getString(R.string.yes), getResources().getString(R.string.no));
-        }
-
         if (map != null) {
             FirebaseUtil.start();
         }
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        if (map != null) {
-            lastCameraPosition = map.getCameraPosition();
-        }
-
-        FirebaseUtil.stop();
-    }
-
 
     private boolean hasLocationPermission() {
         return (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);
@@ -243,41 +221,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_LOCATION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                enableMyLocation();
+                map.setMyLocationEnabled(true);
             }
         }
-    }
-
-    private void buildAlertMessageNoGps(String text, String yesButton, String noButton) {
-        isGPSWindowShowing = true;
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(text)
-                .setCancelable(false)
-                .setPositiveButton(yesButton, new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        isGPSWindowShowing = false;
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
-                .setNegativeButton(noButton, new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        isGPSWindowShowing = false;
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
-
-    private void enableMyLocation() {
-
-        map.setMyLocationEnabled(true);
-
-        if (!alreadyRequestedGPS && !isGPSEnabled()) {
-            buildAlertMessageNoGps(getResources().getString(R.string.gps_disabled), getResources().getString(R.string.yes), getResources().getString(R.string.no));
-            alreadyRequestedGPS = true;
-        }
-
     }
 
     private boolean isGPSEnabled() {
@@ -289,8 +235,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         //Save Data \\
-        outState.putBoolean(GPS_WINDOW, isGPSWindowShowing);
-        outState.putBoolean(GPS_REQUEST, alreadyRequestedGPS);
         outState.putDouble(CAMERA_LATITUDE, lastCameraPosition.target.latitude);
         outState.putDouble(CAMERA_LONGITUDE, lastCameraPosition.target.longitude);
         outState.putFloat(CAMERA_ZOOM, lastCameraPosition.zoom);
@@ -298,10 +242,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onSaveInstanceState(outState);
     }
 
+
+    @Override
+    protected void onPause() {
+        if (map != null) {
+            lastCameraPosition = map.getCameraPosition();
+        }
+
+        FirebaseUtil.pause();
+
+        super.onPause();
+    }
+
     @Override
     protected void onStop() {
-        super.onStop();
-        FirebaseUtil.clear();
+        FirebaseUtil.stop();
         Trash.clear();
+
+        super.onStop();
     }
 }

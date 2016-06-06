@@ -2,10 +2,7 @@
 <resources>
     <string name="app_name" translatable="false">Wein El Zbeileh</string>
 
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
-
-    <string name="gps_disabled">Your GPS is disabled.\nDo you want to enable it?</string>
+    <string name="gps_disabled">GPS is necessary to find your location</string>
 
     <string name="information_title">Information Centre</string>
     <string name="loading">Loading…</string>

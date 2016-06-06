@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="gps_disabled">نظام تحديدالمواقع ليس شغال.\nهل تريد أن تشغله؟</string>
     <string name="information_title">مركز المعلومات</string>
-    <string name="no">كلا</string>
-    <string name="yes">نعم</string>
     <string name="loading">Loading…</string>
+    <string name="gps_disabled">نظام تحديد المواقع لا بد من العثور على موقعك</string>
 </resources>
